@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Usage & Impact Dashboard</title>
-    <!-- Tailwind CSS for Styling -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- PapaParse for Easy CSV Parsing -->
+    <!-- PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
@@ -63,62 +63,61 @@
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-gray-500 text-sm font-medium">Total Respondents</h3>
                 <p id="kpi-total-users" class="text-3xl font-bold text-indigo-600 mt-2">-</p>
-                <span class="text-xs text-gray-400">Count of User_ID</span>[cite: 2]
+                <span class="text-xs text-gray-400">Count of User_ID</span>
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-gray-500 text-sm font-medium">Students / Professionals</h3>
                 <p id="kpi-students-pros" class="text-2xl font-bold text-blue-600 mt-2">-</p>
-                <span class="text-xs text-gray-400">Count by User_Type</span>[cite: 2]
+                <span class="text-xs text-gray-400">Count by User_Type</span>
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-gray-500 text-sm font-medium">Avg Productivity</h3>
                 <p id="kpi-avg-productivity" class="text-3xl font-bold text-emerald-600 mt-2">-</p>
-                <span class="text-xs text-gray-400">Out of 10</span>[cite: 2]
+                <span class="text-xs text-gray-400">Out of 10</span>
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-gray-500 text-sm font-medium">Avg Satisfaction</h3>
                 <p id="kpi-avg-satisfaction" class="text-3xl font-bold text-teal-600 mt-2">-</p>
-                <span class="text-xs text-gray-400">Out of 10</span>[cite: 2]
+                <span class="text-xs text-gray-400">Out of 10</span>
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-gray-500 text-sm font-medium">Avg Time Saved</h3>
                 <p id="kpi-avg-timesaved" class="text-3xl font-bold text-cyan-600 mt-2">-</p>
-                <span class="text-xs text-gray-400">Hours per week</span>[cite: 2]
+                <span class="text-xs text-gray-400">Hours per week</span>
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-gray-500 text-sm font-medium">Would Recommend</h3>
                 <p id="kpi-recommend" class="text-3xl font-bold text-amber-600 mt-2">-</p>
-                <span class="text-xs text-gray-400">Share of "Yes"</span>[cite: 2]
+                <span class="text-xs text-gray-400">Share of "Yes"</span>
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
                 <h3 class="text-gray-500 text-sm font-medium">Paid Users Share</h3>
                 <p id="kpi-paid-users" class="text-3xl font-bold text-purple-600 mt-2">-</p>
-                <span class="text-xs text-gray-400">Share with Monthly_AI_Cost > 0</span>[cite: 2]
+                <span class="text-xs text-gray-400">Share with Monthly_AI_Cost > 0</span>
             </div>
         </div>
 
         <!-- All 10 Charts Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">1. Students vs Professionals</h2>[cite: 3]<div class="h-64"><canvas id="chart1"></canvas></div></div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">2. AI Tool Share (Sorted)</h2>[cite: 3]<div class="h-64"><canvas id="chart2"></canvas></div></div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">3. What AI is Used For</h2>[cite: 3]<div class="h-64"><canvas id="chart3"></canvas></div></div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">4. Tool by Purpose (Stacked Bar)</h2>[cite: 3]<div class="h-64"><canvas id="chart4"></canvas></div></div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">5. AI Use vs Time Saved (Scatter)</h2>[cite: 3]<div class="h-64"><canvas id="chart5"></canvas></div></div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">6. Productivity by Usage Band</h2>[cite: 3]<div class="h-64"><canvas id="chart6"></canvas></div></div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">7. Satisfaction by Tool</h2>[cite: 3]<div class="h-64"><canvas id="chart7"></canvas></div></div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">8. Would Recommend by Tool (100% Stacked)</h2>[cite: 3]<div class="h-64"><canvas id="chart8"></canvas></div></div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">9. Paid vs Free Users (Scores)</h2>[cite: 3]<div class="h-64"><canvas id="chart9"></canvas></div></div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 md:col-span-2"><h2 class="text-lg font-bold text-gray-700 mb-4">10. Respondents by Country</h2>[cite: 3]<div class="h-64"><canvas id="chart10"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">1. Students vs Professionals</h2><div class="h-64"><canvas id="chart1"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">2. AI Tool Share (Sorted)</h2><div class="h-64"><canvas id="chart2"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">3. What AI is Used For</h2><div class="h-64"><canvas id="chart3"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">4. Tool by Purpose (Stacked Bar)</h2><div class="h-64"><canvas id="chart4"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">5. AI Use vs Time Saved (Scatter)</h2><div class="h-64"><canvas id="chart5"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">6. Productivity by Usage Band</h2><div class="h-64"><canvas id="chart6"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">7. Satisfaction by Tool</h2><div class="h-64"><canvas id="chart7"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">8. Would Recommend by Tool (100% Stacked)</h2><div class="h-64"><canvas id="chart8"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">9. Paid vs Free Users (Scores)</h2><div class="h-64"><canvas id="chart9"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 md:col-span-2"><h2 class="text-lg font-bold text-gray-700 mb-4">10. Respondents by Country</h2><div class="h-64"><canvas id="chart10"></canvas></div></div>
         </div>
     </div>
 
-    <!-- JavaScript Loader -->
+    <!-- Script -->
     <script>
         let globalData = [];
         let chartInstances = {};
 
-        // Robust CSV URL path pointing directly to clean folder
-        const csvUrl = './data/clean/ai_usage_clean.csv';
+        const csvUrl = 'data/clean/ai_usage_clean.csv';
 
         Papa.parse(csvUrl, {
             download: true,
@@ -128,18 +127,17 @@
                 if(results.data && results.data.length > 0) {
                     globalData = results.data;
                     document.getElementById('load-status').innerText = 'Live Analytics Ready';
-                    document.getElementById('load-status').className = 'text-sm bg-green-600 px-3 py-1 rounded-full';
+                    document.getElementById('load-status').className = 'text-sm bg-green-600 px-3 py-1 rounded-full text-white';
                     populateFilterDropdowns(globalData);
                     renderDashboard(globalData);
                 } else {
-                    document.getElementById('load-status').innerText = 'CSV Empty Error';
-                    document.getElementById('load-status').className = 'text-sm bg-red-600 px-3 py-1 rounded-full';
+                    document.getElementById('load-status').innerText = 'Data Empty';
                 }
             },
             error: function(err) {
-                console.error("CSV Load Error:", err);
-                document.getElementById('load-status').innerText = 'Failed to load CSV file';
-                document.getElementById('load-status').className = 'text-sm bg-red-600 px-3 py-1 rounded-full';
+                console.error("CSV Error:", err);
+                document.getElementById('load-status').innerText = 'CSV Load Failed';
+                document.getElementById('load-status').className = 'text-sm bg-red-600 px-3 py-1 rounded-full text-white';
             }
         });
 
@@ -259,7 +257,7 @@
 
                 const usageHrs = parseFloat(row.AI_Usage_Hours_Per_Day);
                 if (!isNaN(usageHrs) && !isNaN(tSaved)) {
-                    scatterData.push({ x: usageHrs, y: tSaved, type: uType });
+                    scatterData.push({ x: usageHrs, y: tSaved });
                 }
 
                 const uBand = row.Usage_Band || 'Unspecified';
@@ -277,26 +275,26 @@
                 countryCounts[country] = (countryCounts[country] || 0) + 1;
             });
 
-            // Update KPI Cards UI
+            // KPIs Update
             document.getElementById('kpi-total-users').innerText = totalUsers;
             document.getElementById('kpi-students-pros').innerText = `${studentCount} / ${professionalCount}`;
-            document.getElementById('kpi-avg-productivity').innerText = `${prodCount ? (totalProductivity / prodCount).toFixed(2) : 0} out of 10`;[cite: 2]
-            document.getElementById('kpi-avg-satisfaction').innerText = `${satCount ? (totalSatisfaction / satCount).toFixed(2) : 0} out of 10`;[cite: 2]
-            document.getElementById('kpi-avg-timesaved').innerText = `${timeCount ? (totalTimeSaved / timeCount).toFixed(1) : 0} h per week`;[cite: 2]
-            document.getElementById('kpi-recommend').innerText = `${recommendTotal ? ((recommendYes / recommendTotal) * 100).toFixed(1) : 0}%`;[cite: 2]
-            document.getElementById('kpi-paid-users').innerText = `${totalUsers ? ((paidCount / totalUsers) * 100).toFixed(1) : 0}%`;[cite: 2]
+            document.getElementById('kpi-avg-productivity').innerText = `${prodCount ? (totalProductivity / prodCount).toFixed(2) : 0} out of 10`;
+            document.getElementById('kpi-avg-satisfaction').innerText = `${satCount ? (totalSatisfaction / satCount).toFixed(2) : 0} out of 10`;
+            document.getElementById('kpi-avg-timesaved').innerText = `${timeCount ? (totalTimeSaved / timeCount).toFixed(1) : 0} h per week`;
+            document.getElementById('kpi-recommend').innerText = `${recommendTotal ? ((recommendYes / recommendTotal) * 100).toFixed(1) : 0}%`;
+            document.getElementById('kpi-paid-users').innerText = `${totalUsers ? ((paidCount / totalUsers) * 100).toFixed(1) : 0}%`;
 
-            // Destroy old charts
+            // Destroy old charts safely
             Object.keys(chartInstances).forEach(id => { if (chartInstances[id]) chartInstances[id].destroy(); });
 
-            // 1. Students vs Professionals (Donut)[cite: 3]
+            // 1. Donut
             chartInstances['chart1'] = new Chart(document.getElementById('chart1'), {
                 type: 'doughnut',
                 data: { labels: Object.keys(userTypeCounts), datasets: [{ data: Object.values(userTypeCounts), backgroundColor: ['#3B82F6', '#10B981'] }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // 2. AI Tool Share (Horizontal Bar Sorted)[cite: 3]
+            // 2. Tool Share
             const sortedTools = Object.entries(toolCounts).sort((a,b) => b[1] - a[1]);
             chartInstances['chart2'] = new Chart(document.getElementById('chart2'), {
                 type: 'bar',
@@ -304,7 +302,7 @@
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
             });
 
-            // 3. What AI is used for (Horizontal Bar Sorted)[cite: 3]
+            // 3. Purpose
             const sortedPurposes = Object.entries(purposeCounts).sort((a,b) => b[1] - a[1]);
             chartInstances['chart3'] = new Chart(document.getElementById('chart3'), {
                 type: 'bar',
@@ -312,7 +310,7 @@
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
             });
 
-            // 4. Tool by Purpose (Stacked Bar)[cite: 3]
+            // 4. Tool by Purpose
             const allPurposes = Object.keys(purposeCounts);
             const toolNames = Object.keys(toolByPurpose);
             const datasets4 = allPurposes.map((p, idx) => ({
@@ -326,14 +324,14 @@
                 options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
             });
 
-            // 5. AI use vs time saved (Scatter)[cite: 3]
+            // 5. Scatter
             chartInstances['chart5'] = new Chart(document.getElementById('chart5'), {
                 type: 'scatter',
                 data: { datasets: [{ label: 'Users', data: scatterData, backgroundColor: '#8B5CF6' }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // 6. Productivity by usage band (Column)[cite: 3]
+            // 6. Productivity by Usage
             const usageLabels = Object.keys(usageBandProd);
             const usageProdAvgs = usageLabels.map(l => usageBandProd[l].count ? (usageBandProd[l].sum / usageBandProd[l].count).toFixed(2) : 0);
             chartInstances['chart6'] = new Chart(document.getElementById('chart6'), {
@@ -342,7 +340,7 @@
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // 7. Satisfaction by tool (Bar of Averages)[cite: 3]
+            // 7. Satisfaction by Tool
             const satLabels = Object.keys(toolSatisfaction);
             const satAvgs = satLabels.map(t => toolSatisfaction[t].count ? (toolSatisfaction[t].sum / toolSatisfaction[t].count).toFixed(2) : 0);
             chartInstances['chart7'] = new Chart(document.getElementById('chart7'), {
@@ -351,7 +349,7 @@
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // 8. Would recommend by tool (100% Stacked bar)[cite: 3]
+            // 8. Recommend by Tool
             const recTools = Object.keys(toolRecommend);
             chartInstances['chart8'] = new Chart(document.getElementById('chart8'), {
                 type: 'bar',
@@ -365,7 +363,7 @@
                 options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
             });
 
-            // 9. Paid vs free users (Grouped bar)[cite: 3]
+            // 9. Paid vs Free
             chartInstances['chart9'] = new Chart(document.getElementById('chart9'), {
                 type: 'bar',
                 data: {
@@ -378,7 +376,7 @@
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // 10. Respondents by country (Bar)[cite: 3]
+            // 10. Country
             const sortedCountries = Object.entries(countryCounts).sort((a,b) => b[1] - a[1]);
             chartInstances['chart10'] = new Chart(document.getElementById('chart10'), {
                 type: 'bar',
