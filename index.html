@@ -24,210 +24,396 @@
     <!-- Main Container -->
     <div class="container mx-auto p-6">
         
-        <!-- Filter Section -->
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6 flex items-center justify-between">
-            <div>
-                <label for="userTypeFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter by User Type:</label>
-                <select id="userTypeFilter" onchange="filterAndRender()" class="border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="All">All Users</option>
-                    <option value="Free User">Free User</option>
-                    <option value="Paid User">Paid User</option>
-                </select>
+        <!-- Multi-Filter Section -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-gray-700">Dashboard Filters</h2>
+                <button onclick="resetFilters()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition">Reset All Filters</button>
             </div>
-            <div class="text-right text-sm text-gray-500">
-                Showing data dynamically
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- User Type Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">User Type</label>
+                    <select id="filter-user-type" onchange="filterAndRender()" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500">
+                        <option value="All">All User Types</option>
+                    </select>
+                </div>
+                <!-- Country Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Country</label>
+                    <select id="filter-country" onchange="filterAndRender()" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500">
+                        <option value="All">All Countries</option>
+                    </select>
+                </div>
+                <!-- AI Tool Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">AI Tool</label>
+                    <select id="filter-ai-tool" onchange="filterAndRender()" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500">
+                        <option value="All">All AI Tools</option>
+                    </select>
+                </div>
+                <!-- Age Group Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Age Group</label>
+                    <select id="filter-age-group" onchange="filterAndRender()" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500">
+                        <option value="All">All Age Groups</option>
+                    </select>
+                </div>
             </div>
         </div>
 
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- KPI Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h3 class="text-gray-500 text-sm font-medium">Total Users</h3>
-                <p id="total-users" class="text-3xl font-bold text-indigo-600 mt-2">Loading...</p>
+                <h3 class="text-gray-500 text-sm font-medium">Total Respondents</h3>
+                <p id="kpi-total-users" class="text-3xl font-bold text-indigo-600 mt-2">Loading...</p>
+                <span class="text-xs text-gray-400">Count of User_ID</span>[cite: 2]
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h3 class="text-gray-500 text-sm font-medium">Avg Daily Usage</h3>
-                <p id="avg-usage" class="text-3xl font-bold text-blue-600 mt-2">Loading...</p>
+                <h3 class="text-gray-500 text-sm font-medium">Students / Professionals</h3>
+                <p id="kpi-students-pros" class="text-2xl font-bold text-blue-600 mt-2">Loading...</p>
+                <span class="text-xs text-gray-400">Count by User_Type</span>[cite: 2]
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h3 class="text-gray-500 text-sm font-medium">Paid Users %</h3>
-                <p id="paid-pct" class="text-3xl font-bold text-green-600 mt-2">Loading...</p>
+                <h3 class="text-gray-500 text-sm font-medium">Avg Productivity</h3>
+                <p id="kpi-avg-productivity" class="text-3xl font-bold text-emerald-600 mt-2">Loading...</p>
+                <span class="text-xs text-gray-400">Out of 10</span>[cite: 2]
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h3 class="text-gray-500 text-sm font-medium">Top AI Tool</h3>
-                <p id="top-tool" class="text-3xl font-bold text-purple-600 mt-2">Loading...</p>
+                <h3 class="text-gray-500 text-sm font-medium">Avg Satisfaction</h3>
+                <p id="kpi-avg-satisfaction" class="text-3xl font-bold text-teal-600 mt-2">Loading...</p>
+                <span class="text-xs text-gray-400">Out of 10</span>[cite: 2]
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-gray-500 text-sm font-medium">Avg Time Saved</h3>
+                <p id="kpi-avg-timesaved" class="text-3xl font-bold text-cyan-600 mt-2">Loading...</p>
+                <span class="text-xs text-gray-400">Hours per week</span>[cite: 2]
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-gray-500 text-sm font-medium">Would Recommend</h3>
+                <p id="kpi-recommend" class="text-3xl font-bold text-amber-600 mt-2">Loading...</p>
+                <span class="text-xs text-gray-400">Share of "Yes"</span>[cite: 2]
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
+                <h3 class="text-gray-500 text-sm font-medium">Paid Users Share</h3>
+                <p id="kpi-paid-users" class="text-3xl font-bold text-purple-600 mt-2">Loading...</p>
+                <span class="text-xs text-gray-400">Share with Monthly_AI_Cost > 0</span>[cite: 2]
             </div>
         </div>
 
-        <!-- Charts Grid -->
+        <!-- All 10 Charts Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Chart 1: AI Tool Distribution -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">Most Popular AI Tools</h2>
-                <div class="h-64">
-                    <canvas id="toolChart"></canvas>
-                </div>
+                <h2 class="text-lg font-bold text-gray-700 mb-4">1. Students vs Professionals</h2>[cite: 3]
+                <div class="h-64"><canvas id="chart1"></canvas></div>
             </div>
-
-            <!-- Chart 2: Age Group Distribution -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">Users by Age Group</h2>
-                <div class="h-64">
-                    <canvas id="ageChart"></canvas>
-                </div>
+                <h2 class="text-lg font-bold text-gray-700 mb-4">2. AI Tool Share (Sorted)</h2>[cite: 3]
+                <div class="h-64"><canvas id="chart2"></canvas></div>
             </div>
-
-            <!-- Chart 3: Usage Band -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">Daily AI Usage Band</h2>
-                <div class="h-64">
-                    <canvas id="usageChart"></canvas>
-                </div>
+                <h2 class="text-lg font-bold text-gray-700 mb-4">3. What AI is Used For</h2>[cite: 3]
+                <div class="h-64"><canvas id="chart3"></canvas></div>
             </div>
-
-            <!-- Chart 4: Free vs Paid Users Breakdown -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">Free vs Paid Users Distribution</h2>
-                <div class="h-64">
-                    <canvas id="incomeBandChart"></canvas>
-                </div>
+                <h2 class="text-lg font-bold text-gray-700 mb-4">4. Tool by Purpose (Stacked Bar)</h2>[cite: 3]
+                <div class="h-64"><canvas id="chart4"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">5. AI Use vs Time Saved (Scatter)</h2>[cite: 3]
+                <div class="h-64"><canvas id="chart5"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">6. Productivity by Usage Band</h2>[cite: 3]
+                <div class="h-64"><canvas id="chart6"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">7. Satisfaction by Tool</h2>[cite: 3]
+                <div class="h-64"><canvas id="chart7"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">8. Would Recommend by Tool (100% Stacked)</h2>[cite: 3]
+                <div class="h-64"><canvas id="chart8"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">9. Paid vs Free Users (Scores)</h2>[cite: 3]
+                <div class="h-64"><canvas id="chart9"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 md:col-span-2">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">10. Respondents by Country</h2>[cite: 3]
+                <div class="h-64"><canvas id="chart10"></canvas></div>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript to Fetch CSV and Render Charts with Filter -->
+    <!-- JavaScript for Multi-Filters, KPIs & 10 Charts -->
     <script>
         let globalData = [];
-        let toolChartInstance = null;
-        let ageChartInstance = null;
-        let usageChartInstance = null;
-        let incomeChartInstance = null;
+        let chartInstances = {};
 
         const csvUrl = 'data/clean/ai_usage_clean.csv';
 
-        // Fetch CSV Once
         Papa.parse(csvUrl, {
             download: true,
             header: true,
             skipEmptyLines: true,
             complete: function(results) {
                 globalData = results.data;
+                populateFilterDropdowns(globalData);
                 renderDashboard(globalData);
             }
         });
 
+        function populateFilterDropdowns(data) {
+            const userTypes = new Set();
+            const countries = new Set();
+            const aiTools = new Set();
+            const ageGroups = new Set();
+
+            data.forEach(row => {
+                if (row.User_Type) userTypes.add(row.User_Type.trim());
+                if (row.Country) countries.add(row.Country.trim());
+                if (row.AI_Tool) aiTools.add(row.AI_Tool.trim());
+                if (row.Age_Group) ageGroups.add(row.Age_Group.trim());
+            });
+
+            fillSelect('filter-user-type', userTypes);
+            fillSelect('filter-country', countries);
+            fillSelect('filter-ai-tool', aiTools);
+            fillSelect('filter-age-group', ageGroups);
+        }
+
+        function fillSelect(elementId, setValues) {
+            const select = document.getElementById(elementId);
+            Array.from(setValues).sort().forEach(val => {
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.innerText = val;
+                select.appendChild(opt);
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById('filter-user-type').value = 'All';
+            document.getElementById('filter-country').value = 'All';
+            document.getElementById('filter-ai-tool').value = 'All';
+            document.getElementById('filter-age-group').value = 'All';
+            renderDashboard(globalData);
+        }
+
         function filterAndRender() {
-            const selectedType = document.getElementById('userTypeFilter').value;
-            
-            if (selectedType === 'All') {
-                renderDashboard(globalData);
-            } else {
-                const filteredData = globalData.filter(row => row.Income_Band === selectedType);
-                renderDashboard(filteredData);
-            }
+            const selectedUserType = document.getElementById('filter-user-type').value;
+            const selectedCountry = document.getElementById('filter-country').value;
+            const selectedTool = document.getElementById('filter-ai-tool').value;
+            const selectedAgeGroup = document.getElementById('filter-age-group').value;
+
+            const filteredData = globalData.filter(row => {
+                const matchUser = (selectedUserType === 'All' || (row.User_Type && row.User_Type.trim() === selectedUserType));
+                const matchCountry = (selectedCountry === 'All' || (row.Country && row.Country.trim() === selectedCountry));
+                const matchTool = (selectedTool === 'All' || (row.AI_Tool && row.AI_Tool.trim() === selectedTool));
+                const matchAge = (selectedAgeGroup === 'All' || (row.Age_Group && row.Age_Group.trim() === selectedAgeGroup));
+                return matchUser && matchCountry && matchTool && matchAge;
+            });
+
+            renderDashboard(filteredData);
         }
 
         function renderDashboard(data) {
             const totalUsers = data.length;
-            
             if (totalUsers === 0) {
-                document.getElementById('total-users').innerText = 0;
-                document.getElementById('avg-usage').innerText = '0 hrs';
-                document.getElementById('paid-pct').innerText = '0%';
-                document.getElementById('top-tool').innerText = 'N/A';
+                document.getElementById('kpi-total-users').innerText = 0;
+                document.getElementById('kpi-students-pros').innerText = '0 / 0';
+                document.getElementById('kpi-avg-productivity').innerText = '0 out of 10';[cite: 2]
+                document.getElementById('kpi-avg-satisfaction').innerText = '0 out of 10';[cite: 2]
+                document.getElementById('kpi-avg-timesaved').innerText = '0 h per week';[cite: 2]
+                document.getElementById('kpi-recommend').innerText = '0%';[cite: 2]
+                document.getElementById('kpi-paid-users').innerText = '0%';[cite: 2]
+                Object.keys(chartInstances).forEach(id => { if (chartInstances[id]) chartInstances[id].destroy(); });
                 return;
             }
 
-            let totalHours = 0;
+            let studentCount = 0, professionalCount = 0;
+            let totalProductivity = 0, prodCount = 0;
+            let totalSatisfaction = 0, satCount = 0;
+            let totalTimeSaved = 0, timeCount = 0;
+            let recommendYes = 0, recommendTotal = 0;
             let paidCount = 0;
-            const toolCounts = {};
-            const ageCounts = {};
-            const usageCounts = {};
-            const incomeBandCounts = {};
+
+            let userTypeCounts = { Student: 0, Professional: 0 };
+            let toolCounts = {};
+            let purposeCounts = {};
+            let toolByPurpose = {};
+            let scatterData = [];
+            let usageBandProd = {};
+            let toolSatisfaction = {};
+            let toolRecommend = {};
+            let paidFreeScores = { 'Paid User': { prod: 0, sat: 0, count: 0 }, 'Free User': { prod: 0, sat: 0, count: 0 } };
+            let countryCounts = {};
 
             data.forEach(row => {
-                const hrs = parseFloat(row.AI_Usage_Hours_Per_Day);
-                if (!isNaN(hrs)) totalHours += hrs;
+                const uType = row.User_Type ? row.User_Type.trim() : 'Other';
+                if (uType.toLowerCase().includes('student')) { studentCount++; userTypeCounts['Student']++; }
+                else if (uType.toLowerCase().includes('professional')) { professionalCount++; userTypeCounts['Professional']++; }
+
+                const prod = parseFloat(row.Productivity_Score);
+                if (!isNaN(prod)) { totalProductivity += prod; prodCount++; }
+
+                const sat = parseFloat(row.Satisfaction_Score);
+                if (!isNaN(sat)) { totalSatisfaction += sat; satCount++; }
+
+                const tSaved = parseFloat(row.Time_Saved_Hours_Per_Week);
+                if (!isNaN(tSaved)) { totalTimeSaved += tSaved; timeCount++; }
+
+                const rec = row.Would_Recommend ? row.Would_Recommend.trim().toLowerCase() : '';
+                if (rec === 'yes' || rec === 'y') { recommendYes++; recommendTotal++; }
+                else if (rec === 'no' || rec === 'n') { recommendTotal++; }
+
+                const cost = parseFloat(row.Monthly_AI_Cost);
+                const isPaid = !isNaN(cost) && cost > 0;
+                if (isPaid) paidCount++;
+
+                const userCategory = isPaid ? 'Paid User' : 'Free User';
+                if (!isNaN(prod)) {
+                    paidFreeScores[userCategory].prod += prod;
+                    paidFreeScores[userCategory].sat += sat;
+                    paidFreeScores[userCategory].count++;
+                }
 
                 const tool = row.AI_Tool || 'Unknown';
                 toolCounts[tool] = (toolCounts[tool] || 0) + 1;
 
-                const age = row.Age_Group || 'Unspecified';
-                ageCounts[age] = (ageCounts[age] || 0) + 1;
+                const purpose = row.AI_Purpose || row.Purpose || 'General';
+                purposeCounts[purpose] = (purposeCounts[purpose] || 0) + 1;
 
-                const usage = row.Usage_Band || 'Unspecified';
-                usageCounts[usage] = (usageCounts[usage] || 0) + 1;
+                if (!toolByPurpose[tool]) toolByPurpose[tool] = {};
+                toolByPurpose[tool][purpose] = (toolByPurpose[tool][purpose] || 0) + 1;
 
-                const incomeBand = row.Income_Band || 'Free User';
-                incomeBandCounts[incomeBand] = (incomeBandCounts[incomeBand] || 0) + 1;
-                if (incomeBand === 'Paid User') paidCount++;
+                const usageHrs = parseFloat(row.AI_Usage_Hours_Per_Day);
+                if (!isNaN(usageHrs) && !isNaN(tSaved)) {
+                    scatterData.push({ x: usageHrs, y: tSaved, type: uType });
+                }
+
+                const uBand = row.Usage_Band || 'Unspecified';
+                if (!usageBandProd[uBand]) usageBandProd[uBand] = { sum: 0, count: 0 };
+                if (!isNaN(prod)) { usageBandProd[uBand].sum += prod; usageBandProd[uBand].count++; }
+
+                if (!toolSatisfaction[tool]) toolSatisfaction[tool] = { sum: 0, count: 0 };
+                if (!isNaN(sat)) { toolSatisfaction[tool].sum += sat; toolSatisfaction[tool].count++; }
+
+                if (!toolRecommend[tool]) toolRecommend[tool] = { yes: 0, no: 0 };
+                if (rec === 'yes' || rec === 'y') toolRecommend[tool].yes++;
+                else toolRecommend[tool].no++;
+
+                const country = row.Country || 'Unknown';
+                countryCounts[country] = (countryCounts[country] || 0) + 1;
             });
 
-            // Update Summary Cards
-            document.getElementById('total-users').innerText = totalUsers;
-            document.getElementById('avg-usage').innerText = (totalHours / totalUsers).toFixed(1) + ' hrs';
-            document.getElementById('paid-pct').innerText = ((paidCount / totalUsers) * 100).toFixed(1) + '%';
-            
-            const topTool = Object.keys(toolCounts).length > 0 ? Object.keys(toolCounts).reduce((a, b) => toolCounts[a] > toolCounts[b] ? a : b) : 'N/A';
-            document.getElementById('top-tool').innerText = topTool;
+            // KPI Updates
+            document.getElementById('kpi-total-users').innerText = totalUsers;
+            document.getElementById('kpi-students-pros').innerText = `${studentCount} / ${professionalCount}`;
+            document.getElementById('kpi-avg-productivity').innerText = `${prodCount ? (totalProductivity / prodCount).toFixed(2) : 0} out of 10`;[cite: 2]
+            document.getElementById('kpi-avg-satisfaction').innerText = `${satCount ? (totalSatisfaction / satCount).toFixed(2) : 0} out of 10`;[cite: 2]
+            document.getElementById('kpi-avg-timesaved').innerText = `${timeCount ? (totalTimeSaved / timeCount).toFixed(1) : 0} h per week`;[cite: 2]
+            document.getElementById('kpi-recommend').innerText = `${recommendTotal ? ((recommendYes / recommendTotal) * 100).toFixed(1) : 0}%`;[cite: 2]
+            document.getElementById('kpi-paid-users').innerText = `${totalUsers ? ((paidCount / totalUsers) * 100).toFixed(1) : 0}%`;[cite: 2]
 
-            // Destroy previous chart instances to prevent duplication bugs
-            if (toolChartInstance) toolChartInstance.destroy();
-            if (ageChartInstance) ageChartInstance.destroy();
-            if (usageChartInstance) usageChartInstance.destroy();
-            if (incomeChartInstance) incomeChartInstance.destroy();
+            // Destroy old charts
+            Object.keys(chartInstances).forEach(id => { if (chartInstances[id]) chartInstances[id].destroy(); });
 
-            // --- Chart 1: AI Tools ---
-            toolChartInstance = new Chart(document.getElementById('toolChart'), {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(toolCounts),
-                    datasets: [{
-                        label: 'Users',
-                        data: Object.values(toolCounts),
-                        backgroundColor: '#6366F1'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            // --- Chart 2: Age Group ---
-            ageChartInstance = new Chart(document.getElementById('ageChart'), {
-                type: 'pie',
-                data: {
-                    labels: Object.keys(ageCounts),
-                    datasets: [{
-                        data: Object.values(ageCounts),
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            // --- Chart 3: Usage Band ---
-            usageChartInstance = new Chart(document.getElementById('usageChart'), {
+            // 1. Students vs Professionals (Donut)[cite: 3]
+            chartInstances['chart1'] = new Chart(document.getElementById('chart1'), {
                 type: 'doughnut',
+                data: { labels: Object.keys(userTypeCounts), datasets: [{ data: Object.values(userTypeCounts), backgroundColor: ['#3B82F6', '#10B981'] }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // 2. AI Tool Share (Horizontal Bar Sorted)[cite: 3]
+            const sortedTools = Object.entries(toolCounts).sort((a,b) => b[1] - a[1]);
+            chartInstances['chart2'] = new Chart(document.getElementById('chart2'), {
+                type: 'bar',
+                data: { labels: sortedTools.map(x => x[0]), datasets: [{ label: 'Users', data: sortedTools.map(x => x[1]), backgroundColor: '#6366F1' }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+            });
+
+            // 3. What AI is used for (Horizontal Bar Sorted)[cite: 3]
+            const sortedPurposes = Object.entries(purposeCounts).sort((a,b) => b[1] - a[1]);
+            chartInstances['chart3'] = new Chart(document.getElementById('chart3'), {
+                type: 'bar',
+                data: { labels: sortedPurposes.map(x => x[0]), datasets: [{ label: 'Count', data: sortedPurposes.map(x => x[1]), backgroundColor: '#06B6D4' }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+            });
+
+            // 4. Tool by Purpose (Stacked Bar)[cite: 3]
+            const allPurposes = Object.keys(purposeCounts);
+            const toolNames = Object.keys(toolByPurpose);
+            const datasets4 = allPurposes.map((p, idx) => ({
+                label: p,
+                data: toolNames.map(t => toolByPurpose[t][p] || 0),
+                backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'][idx % 5]
+            }));
+            chartInstances['chart4'] = new Chart(document.getElementById('chart4'), {
+                type: 'bar',
+                data: { labels: toolNames, datasets: datasets4 },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+            });
+
+            // 5. AI use vs time saved (Scatter)[cite: 3]
+            chartInstances['chart5'] = new Chart(document.getElementById('chart5'), {
+                type: 'scatter',
+                data: { datasets: [{ label: 'Users', data: scatterData, backgroundColor: '#8B5CF6' }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // 6. Productivity by usage band (Column)[cite: 3]
+            const usageLabels = Object.keys(usageBandProd);
+            const usageProdAvgs = usageLabels.map(l => usageBandProd[l].count ? (usageBandProd[l].sum / usageBandProd[l].count).toFixed(2) : 0);
+            chartInstances['chart6'] = new Chart(document.getElementById('chart6'), {
+                type: 'bar',
+                data: { labels: usageLabels, datasets: [{ label: 'Avg Productivity', data: usageProdAvgs, backgroundColor: '#10B981' }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // 7. Satisfaction by tool (Bar of Averages)[cite: 3]
+            const satLabels = Object.keys(toolSatisfaction);
+            const satAvgs = satLabels.map(t => toolSatisfaction[t].count ? (toolSatisfaction[t].sum / toolSatisfaction[t].count).toFixed(2) : 0);
+            chartInstances['chart7'] = new Chart(document.getElementById('chart7'), {
+                type: 'bar',
+                data: { labels: satLabels, datasets: [{ label: 'Avg Satisfaction', data: satAvgs, backgroundColor: '#F59E0B' }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // 8. Would recommend by tool (100% Stacked bar)[cite: 3]
+            const recTools = Object.keys(toolRecommend);
+            chartInstances['chart8'] = new Chart(document.getElementById('chart8'), {
+                type: 'bar',
                 data: {
-                    labels: Object.keys(usageCounts),
-                    datasets: [{
-                        data: Object.values(usageCounts),
-                        backgroundColor: ['#06B6D4', '#3B82F6', '#6366F1', '#4F46E5']
-                    }]
+                    labels: recTools,
+                    datasets: [
+                        { label: 'Yes', data: recTools.map(t => toolRecommend[t].yes), backgroundColor: '#10B981' },
+                        { label: 'No', data: recTools.map(t => toolRecommend[t].no), backgroundColor: '#EF4444' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+            });
+
+            // 9. Paid vs free users (Grouped bar)[cite: 3]
+            chartInstances['chart9'] = new Chart(document.getElementById('chart9'), {
+                type: 'bar',
+                data: {
+                    labels: ['Paid User', 'Free User'],
+                    datasets: [
+                        { label: 'Productivity', data: [paidFreeScores['Paid User'].count ? paidFreeScores['Paid User'].prod/paidFreeScores['Paid User'].count : 0, paidFreeScores['Free User'].count ? paidFreeScores['Free User'].prod/paidFreeScores['Free User'].count : 0], backgroundColor: '#6366F1' },
+                        { label: 'Satisfaction', data: [paidFreeScores['Paid User'].count ? paidFreeScores['Paid User'].sat/paidFreeScores['Paid User'].count : 0, paidFreeScores['Free User'].count ? paidFreeScores['Free User'].sat/paidFreeScores['Free User'].count : 0], backgroundColor: '#EC4899' }
+                    ]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // --- Chart 4: Income/User Type Band ---
-            incomeChartInstance = new Chart(document.getElementById('incomeBandChart'), {
+            // 10. Respondents by country (Bar)[cite: 3]
+            const sortedCountries = Object.entries(countryCounts).sort((a,b) => b[1] - a[1]);
+            chartInstances['chart10'] = new Chart(document.getElementById('chart10'), {
                 type: 'bar',
-                data: {
-                    labels: Object.keys(incomeBandCounts),
-                    datasets: [{
-                        label: 'User Count',
-                        data: Object.values(incomeBandCounts),
-                        backgroundColor: ['#10B981', '#F43F5E']
-                    }]
-                },
+                data: { labels: sortedCountries.map(x => x[0]), datasets: [{ label: 'Respondents', data: sortedCountries.map(x => x[1]), backgroundColor: '#3B82F6' }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
         }
