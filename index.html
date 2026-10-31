@@ -3,28 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Usage & Impact Dashboard</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- PapaParse -->
+    <title>AI Usage &amp; Impact Dashboard</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
 
-    <!-- Navbar -->
     <nav class="bg-indigo-600 text-white p-4 shadow-lg">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">🤖 AI Usage & Impact Dashboard</h1>
+            <h1 class="text-2xl font-bold">🤖 AI Usage &amp; Impact Dashboard</h1>
             <span id="load-status" class="text-sm bg-indigo-700 px-3 py-1 rounded-full">Loading Data...</span>
         </div>
     </nav>
 
-    <!-- Main Container -->
     <div class="container mx-auto p-6">
-        
-        <!-- Multi-Filter Section -->
+
+        <!-- Error box (hidden by default) -->
+        <div id="error-box" class="hidden bg-red-50 border border-red-300 text-red-700 rounded-lg p-4 mb-6 text-sm"></div>
+
+        <!-- Filters -->
         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-bold text-gray-700">Dashboard Filters</h2>
@@ -58,7 +56,7 @@
             </div>
         </div>
 
-        <!-- KPI Cards Grid -->
+        <!-- KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-gray-500 text-sm font-medium">Total Respondents</h3>
@@ -93,11 +91,11 @@
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
                 <h3 class="text-gray-500 text-sm font-medium">Paid Users Share</h3>
                 <p id="kpi-paid-users" class="text-3xl font-bold text-purple-600 mt-2">-</p>
-                <span class="text-xs text-gray-400">Share with Monthly_AI_Cost > 0</span>
+                <span class="text-xs text-gray-400">Share with Monthly_AI_Cost &gt; 0</span>
             </div>
         </div>
 
-        <!-- All 10 Charts Grid -->
+        <!-- Charts -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">1. Students vs Professionals</h2><div class="h-64"><canvas id="chart1"></canvas></div></div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">2. AI Tool Share (Sorted)</h2><div class="h-64"><canvas id="chart2"></canvas></div></div>
@@ -112,52 +110,82 @@
         </div>
     </div>
 
-    <!-- Script -->
     <script>
         let globalData = [];
         let chartInstances = {};
 
+        // NOTE: browser Excel (.xlsx) nahi padh sakta. Excel ko CSV me save karke is exact path par rakho
+        // (GitHub case-sensitive hai).
         const csvUrl = 'data/clean/ai_usage_clean.csv';
+        const PALETTE = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#EC4899', '#84CC16', '#F97316', '#64748B'];
+
+        function showError(msg) {
+            const box = document.getElementById('error-box');
+            box.classList.remove('hidden');
+            box.innerText = msg;
+        }
+
+        function setStatus(text, cls) {
+            const el = document.getElementById('load-status');
+            el.innerText = text;
+            el.className = 'text-sm px-3 py-1 rounded-full text-white ' + cls;
+        }
 
         Papa.parse(csvUrl, {
             download: true,
             header: true,
             skipEmptyLines: true,
-            complete: function(results) {
-                if(results.data && results.data.length > 0) {
-                    globalData = results.data;
-                    document.getElementById('load-status').innerText = 'Live Analytics Ready';
-                    document.getElementById('load-status').className = 'text-sm bg-green-600 px-3 py-1 rounded-full text-white';
-                    populateFilterDropdowns(globalData);
-                    renderDashboard(globalData);
-                } else {
-                    document.getElementById('load-status').innerText = 'Data Empty';
+            transformHeader: h => h.trim(),
+            complete: function (results) {
+                try {
+                    if (results.data && results.data.length > 0) {
+                        globalData = results.data;
+                        populateFilterDropdowns(globalData);
+                        renderDashboard(globalData);
+                        setStatus('Live Analytics Ready', 'bg-green-600');
+                    } else {
+                        setStatus('Data Empty', 'bg-red-600');
+                        showError('CSV mili, lekin usme koi row nahi hai: ' + csvUrl);
+                    }
+                } catch (e) {
+                    console.error(e);
+                    setStatus('Render Error', 'bg-red-600');
+                    showError('Dashboard render karte waqt error: ' + e.message);
                 }
             },
-            error: function(err) {
-                console.error("CSV Error:", err);
-                document.getElementById('load-status').innerText = 'CSV Load Failed';
-                document.getElementById('load-status').className = 'text-sm bg-red-600 px-3 py-1 rounded-full text-white';
+            error: function (err) {
+                console.error('CSV Error:', err);
+                setStatus('CSV Load Failed', 'bg-red-600');
+                showError('CSV load nahi hui. Check karo ki file is path par hai (case-sensitive): ' + csvUrl);
             }
         });
 
+        // ---------- helpers ----------
+        function clean(v) { return (v === undefined || v === null) ? '' : String(v).trim(); }
+        function num(v) { const n = parseFloat(clean(v)); return isNaN(n) ? null : n; }
+        function avg(sum, count, digits) { return count ? Number((sum / count).toFixed(digits)) : 0; }
+
+        function usageBand(row) {
+            const given = clean(row.Usage_Band);
+            if (given) return given;
+            const h = num(row.AI_Usage_Hours_Per_Day);
+            if (h === null) return 'Unspecified';
+            if (h < 1) return '0-1 hrs';
+            if (h < 3) return '1-3 hrs';
+            if (h < 5) return '3-5 hrs';
+            return '5+ hrs';
+        }
+
+        // ---------- filters ----------
         function populateFilterDropdowns(data) {
-            const userTypes = new Set();
-            const countries = new Set();
-            const aiTools = new Set();
-            const ageGroups = new Set();
-
+            const sets = { 'filter-user-type': new Set(), 'filter-country': new Set(), 'filter-ai-tool': new Set(), 'filter-age-group': new Set() };
             data.forEach(row => {
-                if (row.User_Type) userTypes.add(row.User_Type.trim());
-                if (row.Country) countries.add(row.Country.trim());
-                if (row.AI_Tool) aiTools.add(row.AI_Tool.trim());
-                if (row.Age_Group) ageGroups.add(row.Age_Group.trim());
+                if (clean(row.User_Type)) sets['filter-user-type'].add(clean(row.User_Type));
+                if (clean(row.Country)) sets['filter-country'].add(clean(row.Country));
+                if (clean(row.AI_Tool)) sets['filter-ai-tool'].add(clean(row.AI_Tool));
+                if (clean(row.Age_Group)) sets['filter-age-group'].add(clean(row.Age_Group));
             });
-
-            fillSelect('filter-user-type', userTypes);
-            fillSelect('filter-country', countries);
-            fillSelect('filter-ai-tool', aiTools);
-            fillSelect('filter-age-group', ageGroups);
+            Object.keys(sets).forEach(id => fillSelect(id, sets[id]));
         }
 
         function fillSelect(elementId, setValues) {
@@ -171,217 +199,227 @@
         }
 
         function resetFilters() {
-            document.getElementById('filter-user-type').value = 'All';
-            document.getElementById('filter-country').value = 'All';
-            document.getElementById('filter-ai-tool').value = 'All';
-            document.getElementById('filter-age-group').value = 'All';
+            ['filter-user-type', 'filter-country', 'filter-ai-tool', 'filter-age-group'].forEach(id => {
+                document.getElementById(id).value = 'All';
+            });
             renderDashboard(globalData);
         }
 
         function filterAndRender() {
-            const selectedUserType = document.getElementById('filter-user-type').value;
-            const selectedCountry = document.getElementById('filter-country').value;
-            const selectedTool = document.getElementById('filter-ai-tool').value;
-            const selectedAgeGroup = document.getElementById('filter-age-group').value;
+            const u = document.getElementById('filter-user-type').value;
+            const c = document.getElementById('filter-country').value;
+            const t = document.getElementById('filter-ai-tool').value;
+            const a = document.getElementById('filter-age-group').value;
 
-            const filteredData = globalData.filter(row => {
-                const matchUser = (selectedUserType === 'All' || (row.User_Type && row.User_Type.trim() === selectedUserType));
-                const matchCountry = (selectedCountry === 'All' || (row.Country && row.Country.trim() === selectedCountry));
-                const matchTool = (selectedTool === 'All' || (row.AI_Tool && row.AI_Tool.trim() === selectedTool));
-                const matchAge = (selectedAgeGroup === 'All' || (row.Age_Group && row.Age_Group.trim() === selectedAgeGroup));
-                return matchUser && matchCountry && matchTool && matchAge;
-            });
-
-            renderDashboard(filteredData);
+            const filtered = globalData.filter(row =>
+                (u === 'All' || clean(row.User_Type) === u) &&
+                (c === 'All' || clean(row.Country) === c) &&
+                (t === 'All' || clean(row.AI_Tool) === t) &&
+                (a === 'All' || clean(row.Age_Group) === a)
+            );
+            renderDashboard(filtered);
         }
 
+        // ---------- render ----------
         function renderDashboard(data) {
             const totalUsers = data.length;
-            if (totalUsers === 0) return;
+
+            // Kisi bhi filter combination me data na ho to KPIs ko 0 dikhao aur charts clear karo
+            if (totalUsers === 0) {
+                ['kpi-total-users', 'kpi-students-pros', 'kpi-avg-productivity', 'kpi-avg-satisfaction',
+                 'kpi-avg-timesaved', 'kpi-recommend', 'kpi-paid-users'].forEach(id => document.getElementById(id).innerText = '0');
+                Object.keys(chartInstances).forEach(id => { if (chartInstances[id]) chartInstances[id].destroy(); });
+                chartInstances = {};
+                return;
+            }
 
             let studentCount = 0, professionalCount = 0;
-            let totalProductivity = 0, prodCount = 0;
-            let totalSatisfaction = 0, satCount = 0;
-            let totalTimeSaved = 0, timeCount = 0;
-            let recommendYes = 0, recommendTotal = 0;
-            let paidCount = 0;
+            let sumProd = 0, nProd = 0, sumSat = 0, nSat = 0, sumTime = 0, nTime = 0;
+            let recYes = 0, recTotal = 0, paidCount = 0;
 
-            let userTypeCounts = { Student: 0, Professional: 0 };
-            let toolCounts = {};
-            let purposeCounts = {};
-            let toolByPurpose = {};
-            let scatterData = [];
-            let usageBandProd = {};
-            let toolSatisfaction = {};
-            let toolRecommend = {};
-            let paidFreeScores = { 'Paid User': { prod: 0, sat: 0, count: 0 }, 'Free User': { prod: 0, sat: 0, count: 0 } };
-            let countryCounts = {};
+            const toolCounts = {}, purposeCounts = {}, toolByPurpose = {}, countryCounts = {};
+            const scatterData = [], usageBandProd = {}, toolSat = {}, toolRec = {};
+            const paidFree = {
+                'Paid User': { prod: 0, nProd: 0, sat: 0, nSat: 0 },
+                'Free User': { prod: 0, nProd: 0, sat: 0, nSat: 0 }
+            };
 
             data.forEach(row => {
-                const uType = row.User_Type ? row.User_Type.trim() : 'Other';
-                if (uType.toLowerCase().includes('student')) { studentCount++; userTypeCounts['Student']++; }
-                else if (uType.toLowerCase().includes('professional')) { professionalCount++; userTypeCounts['Professional']++; }
+                const uType = clean(row.User_Type).toLowerCase();
+                if (uType.includes('student')) studentCount++;
+                else if (uType.includes('professional')) professionalCount++;
 
-                const prod = parseFloat(row.Productivity_Score);
-                if (!isNaN(prod)) { totalProductivity += prod; prodCount++; }
+                const prod = num(row.Productivity_Score);
+                const sat = num(row.Satisfaction_Score);
+                const tSaved = num(row.Time_Saved_Hours_Per_Week);
+                if (prod !== null) { sumProd += prod; nProd++; }
+                if (sat !== null) { sumSat += sat; nSat++; }
+                if (tSaved !== null) { sumTime += tSaved; nTime++; }
 
-                const sat = parseFloat(row.Satisfaction_Score);
-                if (!isNaN(sat)) { totalSatisfaction += sat; satCount++; }
+                const rec = clean(row.Would_Recommend).toLowerCase();
+                const isYes = (rec === 'yes' || rec === 'y');
+                const isNo = (rec === 'no' || rec === 'n');
+                if (isYes) { recYes++; recTotal++; } else if (isNo) { recTotal++; }
 
-                const tSaved = parseFloat(row.Time_Saved_Hours_Per_Week);
-                if (!isNaN(tSaved)) { totalTimeSaved += tSaved; timeCount++; }
-
-                const rec = row.Would_Recommend ? row.Would_Recommend.trim().toLowerCase() : '';
-                if (rec === 'yes' || rec === 'y') { recommendYes++; recommendTotal++; }
-                else if (rec === 'no' || rec === 'n') { recommendTotal++; }
-
-                const cost = parseFloat(row.Monthly_AI_Cost);
-                const isPaid = !isNaN(cost) && cost > 0;
+                const cost = num(row.Monthly_AI_Cost);
+                const isPaid = cost !== null && cost > 0;
                 if (isPaid) paidCount++;
+                const grp = paidFree[isPaid ? 'Paid User' : 'Free User'];
+                if (prod !== null) { grp.prod += prod; grp.nProd++; }
+                if (sat !== null) { grp.sat += sat; grp.nSat++; }
 
-                const userCategory = isPaid ? 'Paid User' : 'Free User';
-                if (!isNaN(prod)) {
-                    paidFreeScores[userCategory].prod += prod;
-                    paidFreeScores[userCategory].sat += sat;
-                    paidFreeScores[userCategory].count++;
-                }
-
-                const tool = row.AI_Tool || 'Unknown';
+                const tool = clean(row.AI_Tool) || 'Unknown';
                 toolCounts[tool] = (toolCounts[tool] || 0) + 1;
 
-                const purpose = row.AI_Purpose || row.Purpose || 'General';
+                const purpose = clean(row.AI_Purpose) || clean(row.Purpose) || clean(row.Primary_Use) || 'General';
                 purposeCounts[purpose] = (purposeCounts[purpose] || 0) + 1;
-
                 if (!toolByPurpose[tool]) toolByPurpose[tool] = {};
                 toolByPurpose[tool][purpose] = (toolByPurpose[tool][purpose] || 0) + 1;
 
-                const usageHrs = parseFloat(row.AI_Usage_Hours_Per_Day);
-                if (!isNaN(usageHrs) && !isNaN(tSaved)) {
-                    scatterData.push({ x: usageHrs, y: tSaved });
-                }
+                const hrs = num(row.AI_Usage_Hours_Per_Day);
+                if (hrs !== null && tSaved !== null) scatterData.push({ x: hrs, y: tSaved });
 
-                const uBand = row.Usage_Band || 'Unspecified';
-                if (!usageBandProd[uBand]) usageBandProd[uBand] = { sum: 0, count: 0 };
-                if (!isNaN(prod)) { usageBandProd[uBand].sum += prod; usageBandProd[uBand].count++; }
+                const band = usageBand(row);
+                if (!usageBandProd[band]) usageBandProd[band] = { sum: 0, count: 0 };
+                if (prod !== null) { usageBandProd[band].sum += prod; usageBandProd[band].count++; }
 
-                if (!toolSatisfaction[tool]) toolSatisfaction[tool] = { sum: 0, count: 0 };
-                if (!isNaN(sat)) { toolSatisfaction[tool].sum += sat; toolSatisfaction[tool].count++; }
+                if (!toolSat[tool]) toolSat[tool] = { sum: 0, count: 0 };
+                if (sat !== null) { toolSat[tool].sum += sat; toolSat[tool].count++; }
 
-                if (!toolRecommend[tool]) toolRecommend[tool] = { yes: 0, no: 0 };
-                if (rec === 'yes' || rec === 'y') toolRecommend[tool].yes++;
-                else toolRecommend[tool].no++;
+                if (!toolRec[tool]) toolRec[tool] = { yes: 0, no: 0 };
+                if (isYes) toolRec[tool].yes++;
+                else if (isNo) toolRec[tool].no++;
 
-                const country = row.Country || 'Unknown';
+                const country = clean(row.Country) || 'Unknown';
                 countryCounts[country] = (countryCounts[country] || 0) + 1;
             });
 
-            // KPIs Update
+            // ----- KPIs -----
             document.getElementById('kpi-total-users').innerText = totalUsers;
             document.getElementById('kpi-students-pros').innerText = `${studentCount} / ${professionalCount}`;
-            document.getElementById('kpi-avg-productivity').innerText = `${prodCount ? (totalProductivity / prodCount).toFixed(2) : 0} out of 10`;
-            document.getElementById('kpi-avg-satisfaction').innerText = `${satCount ? (totalSatisfaction / satCount).toFixed(2) : 0} out of 10`;
-            document.getElementById('kpi-avg-timesaved').innerText = `${timeCount ? (totalTimeSaved / timeCount).toFixed(1) : 0} h per week`;
-            document.getElementById('kpi-recommend').innerText = `${recommendTotal ? ((recommendYes / recommendTotal) * 100).toFixed(1) : 0}%`;
-            document.getElementById('kpi-paid-users').innerText = `${totalUsers ? ((paidCount / totalUsers) * 100).toFixed(1) : 0}%`;
+            document.getElementById('kpi-avg-productivity').innerText = avg(sumProd, nProd, 2).toFixed(2);
+            document.getElementById('kpi-avg-satisfaction').innerText = avg(sumSat, nSat, 2).toFixed(2);
+            document.getElementById('kpi-avg-timesaved').innerText = avg(sumTime, nTime, 1).toFixed(1) + ' h';
+            document.getElementById('kpi-recommend').innerText = (recTotal ? (recYes / recTotal * 100).toFixed(1) : '0.0') + '%';
+            document.getElementById('kpi-paid-users').innerText = (paidCount / totalUsers * 100).toFixed(1) + '%';
 
-            // Destroy old charts safely
+            // ----- Charts -----
             Object.keys(chartInstances).forEach(id => { if (chartInstances[id]) chartInstances[id].destroy(); });
+            chartInstances = {};
+            const base = { responsive: true, maintainAspectRatio: false };
+            const noLegend = { legend: { display: false } };
 
-            // 1. Donut
-            chartInstances['chart1'] = new Chart(document.getElementById('chart1'), {
+            // 1. Students vs Professionals
+            chartInstances.c1 = new Chart(document.getElementById('chart1'), {
                 type: 'doughnut',
-                data: { labels: Object.keys(userTypeCounts), datasets: [{ data: Object.values(userTypeCounts), backgroundColor: ['#3B82F6', '#10B981'] }] },
-                options: { responsive: true, maintainAspectRatio: false }
+                data: { labels: ['Student', 'Professional'], datasets: [{ data: [studentCount, professionalCount], backgroundColor: ['#3B82F6', '#10B981'] }] },
+                options: base
             });
 
-            // 2. Tool Share
-            const sortedTools = Object.entries(toolCounts).sort((a,b) => b[1] - a[1]);
-            chartInstances['chart2'] = new Chart(document.getElementById('chart2'), {
+            // 2. Tool share
+            const sortedTools = Object.entries(toolCounts).sort((a, b) => b[1] - a[1]);
+            chartInstances.c2 = new Chart(document.getElementById('chart2'), {
                 type: 'bar',
                 data: { labels: sortedTools.map(x => x[0]), datasets: [{ label: 'Users', data: sortedTools.map(x => x[1]), backgroundColor: '#6366F1' }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+                options: { ...base, indexAxis: 'y', plugins: noLegend }
             });
 
             // 3. Purpose
-            const sortedPurposes = Object.entries(purposeCounts).sort((a,b) => b[1] - a[1]);
-            chartInstances['chart3'] = new Chart(document.getElementById('chart3'), {
+            const sortedPurposes = Object.entries(purposeCounts).sort((a, b) => b[1] - a[1]);
+            chartInstances.c3 = new Chart(document.getElementById('chart3'), {
                 type: 'bar',
                 data: { labels: sortedPurposes.map(x => x[0]), datasets: [{ label: 'Count', data: sortedPurposes.map(x => x[1]), backgroundColor: '#06B6D4' }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+                options: { ...base, indexAxis: 'y', plugins: noLegend }
             });
 
-            // 4. Tool by Purpose
-            const allPurposes = Object.keys(purposeCounts);
-            const toolNames = Object.keys(toolByPurpose);
-            const datasets4 = allPurposes.map((p, idx) => ({
-                label: p,
-                data: toolNames.map(t => toolByPurpose[t][p] || 0),
-                backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'][idx % 5]
-            }));
-            chartInstances['chart4'] = new Chart(document.getElementById('chart4'), {
+            // 4. Tool by purpose (stacked)
+            const allPurposes = sortedPurposes.map(x => x[0]);
+            const toolNames = sortedTools.map(x => x[0]);
+            chartInstances.c4 = new Chart(document.getElementById('chart4'), {
                 type: 'bar',
-                data: { labels: toolNames, datasets: datasets4 },
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+                data: {
+                    labels: toolNames,
+                    datasets: allPurposes.map((p, i) => ({
+                        label: p,
+                        data: toolNames.map(t => (toolByPurpose[t] && toolByPurpose[t][p]) || 0),
+                        backgroundColor: PALETTE[i % PALETTE.length]
+                    }))
+                },
+                options: { ...base, scales: { x: { stacked: true }, y: { stacked: true } } }
             });
 
             // 5. Scatter
-            chartInstances['chart5'] = new Chart(document.getElementById('chart5'), {
+            chartInstances.c5 = new Chart(document.getElementById('chart5'), {
                 type: 'scatter',
                 data: { datasets: [{ label: 'Users', data: scatterData, backgroundColor: '#8B5CF6' }] },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: {
+                    ...base,
+                    plugins: noLegend,
+                    scales: {
+                        x: { title: { display: true, text: 'AI usage (hours per day)' } },
+                        y: { title: { display: true, text: 'Time saved (hours per week)' } }
+                    }
+                }
             });
 
-            // 6. Productivity by Usage
-            const usageLabels = Object.keys(usageBandProd);
-            const usageProdAvgs = usageLabels.map(l => usageBandProd[l].count ? (usageBandProd[l].sum / usageBandProd[l].count).toFixed(2) : 0);
-            chartInstances['chart6'] = new Chart(document.getElementById('chart6'), {
+            // 6. Productivity by usage band
+            const bandOrder = ['0-1 hrs', '1-3 hrs', '3-5 hrs', '5+ hrs'];
+            const bandLabels = Object.keys(usageBandProd).sort((a, b) => {
+                const ia = bandOrder.indexOf(a), ib = bandOrder.indexOf(b);
+                return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+            });
+            chartInstances.c6 = new Chart(document.getElementById('chart6'), {
                 type: 'bar',
-                data: { labels: usageLabels, datasets: [{ label: 'Avg Productivity', data: usageProdAvgs, backgroundColor: '#10B981' }] },
-                options: { responsive: true, maintainAspectRatio: false }
+                data: { labels: bandLabels, datasets: [{ label: 'Avg Productivity', data: bandLabels.map(l => avg(usageBandProd[l].sum, usageBandProd[l].count, 2)), backgroundColor: '#10B981' }] },
+                options: { ...base, plugins: noLegend, scales: { y: { beginAtZero: true, max: 10 } } }
             });
 
-            // 7. Satisfaction by Tool
-            const satLabels = Object.keys(toolSatisfaction);
-            const satAvgs = satLabels.map(t => toolSatisfaction[t].count ? (toolSatisfaction[t].sum / toolSatisfaction[t].count).toFixed(2) : 0);
-            chartInstances['chart7'] = new Chart(document.getElementById('chart7'), {
+            // 7. Satisfaction by tool
+            const satLabels = Object.keys(toolSat);
+            chartInstances.c7 = new Chart(document.getElementById('chart7'), {
                 type: 'bar',
-                data: { labels: satLabels, datasets: [{ label: 'Avg Satisfaction', data: satAvgs, backgroundColor: '#F59E0B' }] },
-                options: { responsive: true, maintainAspectRatio: false }
+                data: { labels: satLabels, datasets: [{ label: 'Avg Satisfaction', data: satLabels.map(t => avg(toolSat[t].sum, toolSat[t].count, 2)), backgroundColor: '#F59E0B' }] },
+                options: { ...base, plugins: noLegend, scales: { y: { beginAtZero: true, max: 10 } } }
             });
 
-            // 8. Recommend by Tool
-            const recTools = Object.keys(toolRecommend);
-            chartInstances['chart8'] = new Chart(document.getElementById('chart8'), {
+            // 8. Recommend by tool (100% stacked)
+            const recTools = Object.keys(toolRec);
+            const pct = (t, k) => {
+                const tot = toolRec[t].yes + toolRec[t].no;
+                return tot ? Number((toolRec[t][k] / tot * 100).toFixed(1)) : 0;
+            };
+            chartInstances.c8 = new Chart(document.getElementById('chart8'), {
                 type: 'bar',
                 data: {
                     labels: recTools,
                     datasets: [
-                        { label: 'Yes', data: recTools.map(t => toolRecommend[t].yes), backgroundColor: '#10B981' },
-                        { label: 'No', data: recTools.map(t => toolRecommend[t].no), backgroundColor: '#EF4444' }
+                        { label: 'Yes %', data: recTools.map(t => pct(t, 'yes')), backgroundColor: '#10B981' },
+                        { label: 'No %', data: recTools.map(t => pct(t, 'no')), backgroundColor: '#EF4444' }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+                options: { ...base, scales: { x: { stacked: true }, y: { stacked: true, max: 100 } } }
             });
 
             // 9. Paid vs Free
-            chartInstances['chart9'] = new Chart(document.getElementById('chart9'), {
+            const P = paidFree['Paid User'], F = paidFree['Free User'];
+            chartInstances.c9 = new Chart(document.getElementById('chart9'), {
                 type: 'bar',
                 data: {
                     labels: ['Paid User', 'Free User'],
                     datasets: [
-                        { label: 'Productivity', data: [paidFreeScores['Paid User'].count ? paidFreeScores['Paid User'].prod/paidFreeScores['Paid User'].count : 0, paidFreeScores['Free User'].count ? paidFreeScores['Free User'].prod/paidFreeScores['Free User'].count : 0], backgroundColor: '#6366F1' },
-                        { label: 'Satisfaction', data: [paidFreeScores['Paid User'].count ? paidFreeScores['Paid User'].sat/paidFreeScores['Paid User'].count : 0, paidFreeScores['Free User'].count ? paidFreeScores['Free User'].sat/paidFreeScores['Free User'].count : 0], backgroundColor: '#EC4899' }
+                        { label: 'Productivity', data: [avg(P.prod, P.nProd, 2), avg(F.prod, F.nProd, 2)], backgroundColor: '#6366F1' },
+                        { label: 'Satisfaction', data: [avg(P.sat, P.nSat, 2), avg(F.sat, F.nSat, 2)], backgroundColor: '#EC4899' }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { ...base, scales: { y: { beginAtZero: true, max: 10 } } }
             });
 
             // 10. Country
-            const sortedCountries = Object.entries(countryCounts).sort((a,b) => b[1] - a[1]);
-            chartInstances['chart10'] = new Chart(document.getElementById('chart10'), {
+            const sortedCountries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]);
+            chartInstances.c10 = new Chart(document.getElementById('chart10'), {
                 type: 'bar',
                 data: { labels: sortedCountries.map(x => x[0]), datasets: [{ label: 'Respondents', data: sortedCountries.map(x => x[1]), backgroundColor: '#3B82F6' }] },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { ...base, plugins: noLegend }
             });
         }
     </script>
