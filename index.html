@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Usage & Impact Dashboard</title>
+    <!-- Tailwind CSS for Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- PapaParse for Easy CSV Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="bg-indigo-600 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">🤖 AI Usage & Impact Dashboard</h1>
+            <span class="text-sm bg-indigo-700 px-3 py-1 rounded-full">Live Analytics</span>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container mx-auto p-6">
+        
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-gray-500 text-sm font-medium">Total Users</h3>
+                <p id="total-users" class="text-3xl font-bold text-indigo-600 mt-2">Loading...</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-gray-500 text-sm font-medium">Avg Daily Usage</h3>
+                <p id="avg-usage" class="text-3xl font-bold text-blue-600 mt-2">Loading...</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-gray-500 text-sm font-medium">Paid Users %</h3>
+                <p id="paid-pct" class="text-3xl font-bold text-green-600 mt-2">Loading...</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-gray-500 text-sm font-medium">Top AI Tool</h3>
+                <p id="top-tool" class="text-3xl font-bold text-purple-600 mt-2">Loading...</p>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Chart 1: AI Tool Distribution -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">Most Popular AI Tools</h2>
+                <div class="h-64">
+                    <canvas id="toolChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: Age Group Distribution -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">Users by Age Group</h2>
+                <div class="h-64">
+                    <canvas id="ageChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 3: Usage Band -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">Daily AI Usage Band</h2>
+                <div class="h-64">
+                    <canvas id="usageChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 4: Paid vs Free Users (Income Band) -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">Free vs Paid Users</h2>
+                <div class="h-64">
+                    <canvas id="incomeBandChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript to Fetch CSV and Render Charts -->
+    <script>
+        // Path to clean CSV
+        const csvUrl = 'data/clean/ai_usage_clean.csv';
+
+        // Fetch and Parse CSV Data
+        Papa.parse(csvUrl, {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                const data = results.data;
+                renderDashboard(data);
+            }
+        });
+
+        function renderDashboard(data) {
+            // Metrics Calculations
+            const totalUsers = data.length;
+            
+            let totalHours = 0;
+            let paidCount = 0;
+            const toolCounts = {};
+            const ageCounts = {};
+            const usageCounts = {};
+            const incomeBandCounts = {};
+
+            data.forEach(row => {
+                // Usage Hours
+                const hrs = parseFloat(row.AI_Usage_Hours_Per_Day);
+                if (!isNaN(hrs)) totalHours += hrs;
+
+                // Tools
+                const tool = row.AI_Tool || 'Unknown';
+                toolCounts[tool] = (toolCounts[tool] || 0) + 1;
+
+                // Age Group
+                const age = row.Age_Group || 'Unspecified';
+                ageCounts[age] = (ageCounts[age] || 0) + 1;
+
+                // Usage Band
+                const usage = row.Usage_Band || 'Unspecified';
+                usageCounts[usage] = (usageCounts[usage] || 0) + 1;
+
+                // Income Band (Paid vs Free User)
+                const incomeBand = row.Income_Band || 'Free User';
+                incomeBandCounts[incomeBand] = (incomeBandCounts[incomeBand] || 0) + 1;
+                if (incomeBand === 'Paid User') paidCount++;
+            });
+
+            // Update Summary Cards
+            document.getElementById('total-users').innerText = totalUsers;
+            document.getElementById('avg-usage').innerText = (totalHours / totalUsers).toFixed(1) + ' hrs';
+            document.getElementById('paid-pct').innerText = ((paidCount / totalUsers) * 100).toFixed(1) + '%';
+            
+            const topTool = Object.keys(toolCounts).reduce((a, b) => toolCounts[a] > toolCounts[b] ? a : b, 'N/A');
+            document.getElementById('top-tool').innerText = topTool;
+
+            // --- Chart 1: AI Tools (Bar Chart) ---
+            new Chart(document.getElementById('toolChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(toolCounts),
+                    datasets: [{
+                        label: 'Users',
+                        data: Object.values(toolCounts),
+                        backgroundColor: '#6366F1'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // --- Chart 2: Age Group (Pie Chart) ---
+            new Chart(document.getElementById('ageChart'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(ageCounts),
+                    datasets: [{
+                        data: Object.values(ageCounts),
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // --- Chart 3: Usage Band (Doughnut Chart) ---
+            new Chart(document.getElementById('usageChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(usageCounts),
+                    datasets: [{
+                        data: Object.values(usageCounts),
+                        backgroundColor: ['#06B6D4', '#3B82F6', '#6366F1', '#4F46E5']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // --- Chart 4: Paid vs Free Users (Polar Area / Bar) ---
+            new Chart(document.getElementById('incomeBandChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(incomeBandCounts),
+                    datasets: [{
+                        label: 'User Count',
+                        data: Object.values(incomeBandCounts),
+                        backgroundColor: ['#10B981', '#F43F5E']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+    </script>
+</body>
+</html>
