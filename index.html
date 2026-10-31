@@ -17,7 +17,7 @@
     <nav class="bg-indigo-600 text-white p-4 shadow-lg">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold">🤖 AI Usage & Impact Dashboard</h1>
-            <span class="text-sm bg-indigo-700 px-3 py-1 rounded-full">Live Analytics</span>
+            <span id="load-status" class="text-sm bg-indigo-700 px-3 py-1 rounded-full">Loading Data...</span>
         </div>
     </nav>
 
@@ -31,28 +31,24 @@
                 <button onclick="resetFilters()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition">Reset All Filters</button>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- User Type Filter -->
                 <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1">User Type</label>
                     <select id="filter-user-type" onchange="filterAndRender()" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500">
                         <option value="All">All User Types</option>
                     </select>
                 </div>
-                <!-- Country Filter -->
                 <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1">Country</label>
                     <select id="filter-country" onchange="filterAndRender()" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500">
                         <option value="All">All Countries</option>
                     </select>
                 </div>
-                <!-- AI Tool Filter -->
                 <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1">AI Tool</label>
                     <select id="filter-ai-tool" onchange="filterAndRender()" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500">
                         <option value="All">All AI Tools</option>
                     </select>
                 </div>
-                <!-- Age Group Filter -->
                 <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1">Age Group</label>
                     <select id="filter-age-group" onchange="filterAndRender()" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500">
@@ -66,101 +62,84 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-gray-500 text-sm font-medium">Total Respondents</h3>
-                <p id="kpi-total-users" class="text-3xl font-bold text-indigo-600 mt-2">Loading...</p>
+                <p id="kpi-total-users" class="text-3xl font-bold text-indigo-600 mt-2">-</p>
                 <span class="text-xs text-gray-400">Count of User_ID</span>[cite: 2]
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-gray-500 text-sm font-medium">Students / Professionals</h3>
-                <p id="kpi-students-pros" class="text-2xl font-bold text-blue-600 mt-2">Loading...</p>
+                <p id="kpi-students-pros" class="text-2xl font-bold text-blue-600 mt-2">-</p>
                 <span class="text-xs text-gray-400">Count by User_Type</span>[cite: 2]
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-gray-500 text-sm font-medium">Avg Productivity</h3>
-                <p id="kpi-avg-productivity" class="text-3xl font-bold text-emerald-600 mt-2">Loading...</p>
+                <p id="kpi-avg-productivity" class="text-3xl font-bold text-emerald-600 mt-2">-</p>
                 <span class="text-xs text-gray-400">Out of 10</span>[cite: 2]
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-gray-500 text-sm font-medium">Avg Satisfaction</h3>
-                <p id="kpi-avg-satisfaction" class="text-3xl font-bold text-teal-600 mt-2">Loading...</p>
+                <p id="kpi-avg-satisfaction" class="text-3xl font-bold text-teal-600 mt-2">-</p>
                 <span class="text-xs text-gray-400">Out of 10</span>[cite: 2]
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-gray-500 text-sm font-medium">Avg Time Saved</h3>
-                <p id="kpi-avg-timesaved" class="text-3xl font-bold text-cyan-600 mt-2">Loading...</p>
+                <p id="kpi-avg-timesaved" class="text-3xl font-bold text-cyan-600 mt-2">-</p>
                 <span class="text-xs text-gray-400">Hours per week</span>[cite: 2]
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h3 class="text-gray-500 text-sm font-medium">Would Recommend</h3>
-                <p id="kpi-recommend" class="text-3xl font-bold text-amber-600 mt-2">Loading...</p>
+                <p id="kpi-recommend" class="text-3xl font-bold text-amber-600 mt-2">-</p>
                 <span class="text-xs text-gray-400">Share of "Yes"</span>[cite: 2]
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
                 <h3 class="text-gray-500 text-sm font-medium">Paid Users Share</h3>
-                <p id="kpi-paid-users" class="text-3xl font-bold text-purple-600 mt-2">Loading...</p>
+                <p id="kpi-paid-users" class="text-3xl font-bold text-purple-600 mt-2">-</p>
                 <span class="text-xs text-gray-400">Share with Monthly_AI_Cost > 0</span>[cite: 2]
             </div>
         </div>
 
         <!-- All 10 Charts Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">1. Students vs Professionals</h2>[cite: 3]
-                <div class="h-64"><canvas id="chart1"></canvas></div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">2. AI Tool Share (Sorted)</h2>[cite: 3]
-                <div class="h-64"><canvas id="chart2"></canvas></div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">3. What AI is Used For</h2>[cite: 3]
-                <div class="h-64"><canvas id="chart3"></canvas></div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">4. Tool by Purpose (Stacked Bar)</h2>[cite: 3]
-                <div class="h-64"><canvas id="chart4"></canvas></div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">5. AI Use vs Time Saved (Scatter)</h2>[cite: 3]
-                <div class="h-64"><canvas id="chart5"></canvas></div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">6. Productivity by Usage Band</h2>[cite: 3]
-                <div class="h-64"><canvas id="chart6"></canvas></div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">7. Satisfaction by Tool</h2>[cite: 3]
-                <div class="h-64"><canvas id="chart7"></canvas></div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">8. Would Recommend by Tool (100% Stacked)</h2>[cite: 3]
-                <div class="h-64"><canvas id="chart8"></canvas></div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">9. Paid vs Free Users (Scores)</h2>[cite: 3]
-                <div class="h-64"><canvas id="chart9"></canvas></div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 md:col-span-2">
-                <h2 class="text-lg font-bold text-gray-700 mb-4">10. Respondents by Country</h2>[cite: 3]
-                <div class="h-64"><canvas id="chart10"></canvas></div>
-            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">1. Students vs Professionals</h2>[cite: 3]<div class="h-64"><canvas id="chart1"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">2. AI Tool Share (Sorted)</h2>[cite: 3]<div class="h-64"><canvas id="chart2"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">3. What AI is Used For</h2>[cite: 3]<div class="h-64"><canvas id="chart3"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">4. Tool by Purpose (Stacked Bar)</h2>[cite: 3]<div class="h-64"><canvas id="chart4"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">5. AI Use vs Time Saved (Scatter)</h2>[cite: 3]<div class="h-64"><canvas id="chart5"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">6. Productivity by Usage Band</h2>[cite: 3]<div class="h-64"><canvas id="chart6"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">7. Satisfaction by Tool</h2>[cite: 3]<div class="h-64"><canvas id="chart7"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">8. Would Recommend by Tool (100% Stacked)</h2>[cite: 3]<div class="h-64"><canvas id="chart8"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h2 class="text-lg font-bold text-gray-700 mb-4">9. Paid vs Free Users (Scores)</h2>[cite: 3]<div class="h-64"><canvas id="chart9"></canvas></div></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 md:col-span-2"><h2 class="text-lg font-bold text-gray-700 mb-4">10. Respondents by Country</h2>[cite: 3]<div class="h-64"><canvas id="chart10"></canvas></div></div>
         </div>
     </div>
 
-    <!-- JavaScript for Multi-Filters, KPIs & 10 Charts -->
+    <!-- JavaScript Loader -->
     <script>
         let globalData = [];
         let chartInstances = {};
 
-        const csvUrl = 'data/clean/ai_usage_clean.csv';
+        // Robust CSV URL path pointing directly to clean folder
+        const csvUrl = './data/clean/ai_usage_clean.csv';
 
         Papa.parse(csvUrl, {
             download: true,
             header: true,
             skipEmptyLines: true,
             complete: function(results) {
-                globalData = results.data;
-                populateFilterDropdowns(globalData);
-                renderDashboard(globalData);
+                if(results.data && results.data.length > 0) {
+                    globalData = results.data;
+                    document.getElementById('load-status').innerText = 'Live Analytics Ready';
+                    document.getElementById('load-status').className = 'text-sm bg-green-600 px-3 py-1 rounded-full';
+                    populateFilterDropdowns(globalData);
+                    renderDashboard(globalData);
+                } else {
+                    document.getElementById('load-status').innerText = 'CSV Empty Error';
+                    document.getElementById('load-status').className = 'text-sm bg-red-600 px-3 py-1 rounded-full';
+                }
+            },
+            error: function(err) {
+                console.error("CSV Load Error:", err);
+                document.getElementById('load-status').innerText = 'Failed to load CSV file';
+                document.getElementById('load-status').className = 'text-sm bg-red-600 px-3 py-1 rounded-full';
             }
         });
 
@@ -220,17 +199,7 @@
 
         function renderDashboard(data) {
             const totalUsers = data.length;
-            if (totalUsers === 0) {
-                document.getElementById('kpi-total-users').innerText = 0;
-                document.getElementById('kpi-students-pros').innerText = '0 / 0';
-                document.getElementById('kpi-avg-productivity').innerText = '0 out of 10';[cite: 2]
-                document.getElementById('kpi-avg-satisfaction').innerText = '0 out of 10';[cite: 2]
-                document.getElementById('kpi-avg-timesaved').innerText = '0 h per week';[cite: 2]
-                document.getElementById('kpi-recommend').innerText = '0%';[cite: 2]
-                document.getElementById('kpi-paid-users').innerText = '0%';[cite: 2]
-                Object.keys(chartInstances).forEach(id => { if (chartInstances[id]) chartInstances[id].destroy(); });
-                return;
-            }
+            if (totalUsers === 0) return;
 
             let studentCount = 0, professionalCount = 0;
             let totalProductivity = 0, prodCount = 0;
@@ -308,7 +277,7 @@
                 countryCounts[country] = (countryCounts[country] || 0) + 1;
             });
 
-            // KPI Updates
+            // Update KPI Cards UI
             document.getElementById('kpi-total-users').innerText = totalUsers;
             document.getElementById('kpi-students-pros').innerText = `${studentCount} / ${professionalCount}`;
             document.getElementById('kpi-avg-productivity').innerText = `${prodCount ? (totalProductivity / prodCount).toFixed(2) : 0} out of 10`;[cite: 2]
